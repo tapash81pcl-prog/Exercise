@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Morning Warm-up · 15 min</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#081a1d;
+    --bg-1:#0e2429;
+    --card:#123137;
+    --line: rgba(232,241,238,0.08);
+    --sun:#e8a13c;
+    --sun-dim: rgba(232,161,60,0.16);
+    --sage:#8fd3b6;
+    --text:#eef5f3;
+    --dim:#9fc2bf;
+    --danger:#ff8a7a;
+    --radius: 22px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Inter', system-ui, sans-serif;
+    background:
+      radial-gradient(120% 60% at 50% -10%, #163b3f 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1));
+    color:var(--text);
+    min-height:100dvh;
+    display:flex;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .phone{
+    width:100%;
+    max-width:430px;
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    padding: max(30px, calc(env(safe-area-inset-top) + 18px)) 18px max(30px, calc(env(safe-area-inset-bottom) + 18px));
+  }
+
+  /* ---------- header ---------- */
+  header{ text-align:center; padding: 0 0 20px; }
+  .eyebrow{
+    font-size:12.5px; color:var(--dim); letter-spacing:.02em; margin:0 0 5px;
+  }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 21px; font-weight:600; margin:0;
+    letter-spacing: -0.01em;
+  }
+
+  /* ---------- stage rail ---------- */
+  .rail{
+    display:flex; gap:6px; justify-content:center; margin: 0 0 20px;
+  }
+  .rail .seg{
+    height:4px; width:38px; border-radius:3px; background:var(--line);
+    overflow:hidden; position:relative;
+  }
+  .rail .seg .fill{
+    position:absolute; inset:0; width:0%; background:var(--sun);
+    transition: width .3s ease;
+  }
+  .rail .seg.done .fill{ width:100%; background:var(--sage); }
+
+  /* ---------- main card ---------- */
+  .card{
+    background: linear-gradient(180deg, var(--card), rgba(18,49,55,0.7));
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px 20px 22px;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    justify-content: space-between;
+    gap: 18px;
+  }
+  .stage-label{
+    font-size:12.5px; color:var(--sun); font-weight:600;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .stage-name{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:21px; font-weight:700; margin: 4px 0 0;
+    letter-spacing:-0.01em;
+  }
+
+  /* ---------- dial ---------- */
+  .dial-wrap{
+    position:relative;
+    width: 178px; height:178px;
+    margin: 4px auto 0;
+    flex: 0 0 auto;
+  }
+  .dial-wrap svg{ width:100%; height:100%; transform: rotate(-90deg); }
+  .dial-wrap .track{ fill:none; stroke:var(--line); stroke-width:9; }
+  .dial-wrap .fillring{
+    fill:none; stroke:var(--sun); stroke-width:9; stroke-linecap:round;
+    transition: stroke-dashoffset 1s linear, stroke .25s ease;
+  }
+  .breath-circle{
+    position:absolute; left:50%; top:50%;
+    width:96px; height:96px; margin:-48px 0 0 -48px;
+    border-radius:50%;
+    background: radial-gradient(circle, var(--sun-dim), transparent 72%);
+    transform: scale(0.6);
+    transition: transform 1s linear;
+    pointer-events:none;
+  }
+  .dial-center{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+  }
+  .clock{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:36px; font-weight:700; font-variant-numeric: tabular-nums;
+    letter-spacing:-0.01em;
+  }
+  .clock.danger{ color:var(--danger); }
+  .dial-sub{ font-size:11.5px; color:var(--dim); margin-top:2px; }
+
+  /* ---------- rotating phrase ---------- */
+  .phrase-zone{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height: 96px;
+    gap: 12px;
+  }
+  .phrase-card{
+    width:100%;
+    text-align:center;
+    opacity:1;
+    transform: translateY(0);
+    transition: opacity .22s ease, transform .22s ease;
+  }
+  .phrase-card.swap{
+    opacity:0;
+    transform: translateY(6px);
+  }
+  .phrase-text{
+    font-size:16.5px;
+    line-height:1.5;
+    color:var(--text);
+    font-weight:500;
+  }
+  .phrase-text.big-phase{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:28px;
+    font-weight:700;
+    color: var(--sun);
+    letter-spacing:-0.01em;
+  }
+  .item-bar{
+    width:120px; height:3px; border-radius:2px; background:var(--line);
+    overflow:hidden;
+  }
+  .item-bar-fill{
+    height:100%; width:0%; background:var(--sage);
+    transition: width 1s linear;
+  }
+  .bottom-note{
+    font-size:12.5px; color:var(--dim); text-align:center;
+    min-height:16px;
+  }
+
+  /* ---------- controls ---------- */
+  .controls{
+    display:flex; gap:10px;
+  }
+  button{
+    font-family:'Inter', sans-serif;
+    border:none; border-radius:14px; cursor:pointer;
+    font-weight:600; color:var(--text);
+    background: rgba(255,255,255,0.06);
+    transition: transform .08s ease, background .15s ease;
+  }
+  button:active{ transform: scale(0.96); }
+  .icon-btn{
+    width:52px; height:52px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+  }
+  .icon-btn:disabled{ opacity:.3; }
+  .primary-btn{
+    flex:1; height:52px; font-size:15.5px;
+    background: var(--sun); color:#1a1204;
+  }
+  .primary-btn.pause-state{ background: rgba(255,255,255,0.1); color:var(--text); }
+
+  footer{
+    text-align:center; padding-top:18px; font-size:12px; color:var(--dim);
+  }
+  footer .bar{
+    width:100%; height:4px; border-radius:3px; background:var(--line);
+    margin-bottom:8px; overflow:hidden;
+  }
+  footer .bar-fill{
+    height:100%; background:var(--sage); width:0%;
+    transition: width .3s ease;
+  }
+
+  .done-screen{
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; flex:1; gap:8px;
+  }
+  .done-screen.show{ display:flex; }
+  .done-screen .big{ font-family:'Space Grotesk', sans-serif; font-size:26px; font-weight:700; }
+  .done-screen p{ color:var(--dim); font-size:14px; max-width:280px; margin:0; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <header>
+    <p class="eyebrow">Daily routine · 5 stages · ~15 min</p>
+    <h1>Morning Warm-up</h1>
+  </header>
+
+  <div class="rail" id="rail"></div>
+
+  <div class="card">
+    <div id="liveView" style="display:flex; flex-direction:column; flex:1; min-height:0; gap:18px;">
+      <div>
+        <div class="stage-label">
+          <span id="stageIndex">Stage 1 / 5</span>
+          <span id="stageDuration">3:00</span>
+        </div>
+        <h2 class="stage-name" id="stageName">Relax the body</h2>
+      </div>
+
+      <div class="dial-wrap">
+        <div class="breath-circle" id="breathCircle"></div>
+        <svg viewBox="0 0 178 178">
+          <circle class="track" cx="89" cy="89" r="79"></circle>
+          <circle class="fillring" id="ring" cx="89" cy="89" r="79"
+                   stroke-dasharray="496" stroke-dashoffset="496"></circle>
+        </svg>
+        <div class="dial-center">
+          <div class="clock" id="clock">03:00</div>
+          <div class="dial-sub" id="clockSub">not started</div>
+        </div>
+      </div>
+
+      <div class="phrase-zone">
+        <div class="phrase-card" id="phraseCard">
+          <div class="phrase-text" id="phraseText">Sit upright in your chair.</div>
+        </div>
+        <div class="item-bar"><div class="item-bar-fill" id="itemBarFill"></div></div>
+        <div class="bottom-note" id="bottomNote"></div>
+      </div>
+    </div>
+
+    <div class="done-screen" id="doneScreen">
+      <div class="big">Routine complete</div>
+      <p>All 15 minutes done for today. Same time tomorrow — your voice will thank you.</p>
+    </div>
+
+    <div class="controls">
+      <button class="icon-btn" id="prevBtn" title="Previous stage">←</button>
+      <button class="primary-btn" id="startBtn">Start</button>
+      <button class="icon-btn" id="nextBtn" title="Next stage">→</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="bar"><div class="bar-fill" id="totalFill"></div></div>
+    <span id="totalLabel">Total progress: 0:00 / 15:06</span>
+  </footer>
+
+</div>
+
+<script>
+/* ---------- helpers to build per-stage rotating schedules ---------- */
+function loopItems(lines, dur){
+  return lines.map(text => ({ text, dur }));
+}
+
+function breathingItems(){
+  const items = [{ text:'Get ready', dur:10, phase:'ready' }];
+  for(let i=0;i<11;i++){
+    items.push({ text:'Inhale', dur:5, phase:'inhale' });
+    items.push({ text:'Exhale', dur:8, phase:'exhale' });
+    items.push({ text:'Rest',   dur:3, phase:'rest' });
+  }
+  return items;
+}
+
+const STAGES = [
+  {
+    name: "Relax the body",
+    breathing: false,
+    items: loopItems([
+      "Sit upright in your chair.",
+      "Let your shoulders drop.",
+      "Keep your jaw loose.",
+      "Rest your tongue naturally at the bottom of your mouth.",
+      "Avoid repeatedly clearing your throat."
+    ], 5),
+    duration: 180
+  },
+  {
+    name: "Slow breathing",
+    breathing: true,
+    items: breathingItems(),
+    bottomNote: "Don't force a deep breath.",
+    duration: null // computed below
+  },
+  {
+    name: "Voice warm-up",
+    breathing: false,
+    items: loopItems([
+      "mmm—mmm—mmm",
+      "ma—me—mi—mo—mu",
+      "Good morning.",
+      "How are you?",
+      "I would like to discuss this matter.",
+      "Let me explain this clearly."
+    ], 10),
+    duration: 180
+  },
+  {
+    name: "Talking to yourself",
+    breathing: false,
+    items: loopItems([
+      "Stand in front of your phone and speak for 1 minute.",
+      "Today I have three things to discuss. First, our sales performance…",
+      "Then do 2 more minutes.",
+      "Speed doesn't matter — deliberately speak 20–30% slower."
+    ], 10),
+    duration: 180
+  },
+  {
+    name: "Nervousness simulation",
+    breathing: false,
+    items: loopItems([
+      "Stand up.",
+      "Imagine 2–3 people are in front of you.",
+      "Stay silent for 10 seconds and settle your breathing.",
+      "Good morning everyone. I would like to discuss three important points today.",
+      "If you get stuck, don't force the words out.",
+      "Pause 2–3 seconds → breathe normally → begin again."
+    ], 5),
+    duration: 180
+  }
+];
+
+// finalize durations + cycle length per stage
+STAGES.forEach(s=>{
+  const cycleLen = s.items.reduce((a,it)=>a+it.dur,0);
+  s.cycleLen = cycleLen;
+  if(s.duration === null) s.duration = cycleLen; // breathing stage: exact, no repeat
+});
+
+const TOTAL = STAGES.reduce((a,s)=>a+s.duration,0);
+const RING_LEN = 496; // 2*pi*79, rounded
+
+let stageIndex = 0;
+let remaining = STAGES[0].duration;
+let running = false;
+let finishedAll = false;
+let intervalId = null;
+let lastItemIndex = -1;
+
+const $ = id => document.getElementById(id);
+const railEl = $('rail');
+const liveView = $('liveView');
+const doneScreen = $('doneScreen');
+const stageIndexEl = $('stageIndex');
+const stageDurationEl = $('stageDuration');
+const stageNameEl = $('stageName');
+const clockEl = $('clock');
+const clockSubEl = $('clockSub');
+const ringEl = $('ring');
+const breathCircle = $('breathCircle');
+const phraseCard = $('phraseCard');
+const phraseText = $('phraseText');
+const itemBarFill = $('itemBarFill');
+const bottomNote = $('bottomNote');
+const startBtn = $('startBtn');
+const prevBtn = $('prevBtn');
+const nextBtn = $('nextBtn');
+const totalFillEl = $('totalFill');
+const totalLabelEl = $('totalLabel');
+
+STAGES.forEach(()=>{
+  const seg = document.createElement('div');
+  seg.className = 'seg';
+  seg.innerHTML = '<div class="fill"></div>';
+  railEl.appendChild(seg);
+});
+
+function fmt(sec){
+  sec = Math.max(0, sec);
+  const m = Math.floor(sec/60), s = sec%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function elapsedBeforeCurrent(){
+  let sum = 0;
+  for(let i=0;i<stageIndex;i++) sum += STAGES[i].duration;
+  return sum;
+}
+
+function getActiveItem(stage, elapsedInStage){
+  const t = elapsedInStage % stage.cycleLen;
+  let acc = 0;
+  for(let i=0;i<stage.items.length;i++){
+    const it = stage.items[i];
+    if(t < acc + it.dur){
+      return { index:i, item:it, itemElapsed: t - acc };
+    }
+    acc += it.dur;
+  }
+  const last = stage.items[stage.items.length-1];
+  return { index: stage.items.length-1, item:last, itemElapsed:last.dur-1 };
+}
+
+function updateBreathCircle(stage, active){
+  if(!stage.breathing){
+    breathCircle.style.transition = 'none';
+    breathCircle.style.transform = 'scale(0.6)';
+    return;
+  }
+  const phase = active.item.phase;
+  if(phase === 'inhale'){
+    breathCircle.style.transition = `transform ${active.item.dur}s linear`;
+    breathCircle.style.transform = 'scale(1.25)';
+  } else if(phase === 'exhale'){
+    breathCircle.style.transition = `transform ${active.item.dur}s linear`;
+    breathCircle.style.transform = 'scale(0.6)';
+  } else if(phase === 'ready'){
+    breathCircle.style.transition = `transform ${active.item.dur}s linear`;
+    breathCircle.style.transform = 'scale(0.6)';
+  }
+  // 'rest' phase: keep current transform (hold position)
+}
+
+function render(justSwapped){
+  doneScreen.classList.remove('show');
+  liveView.style.display = '';
+
+  const stage = STAGES[stageIndex];
+  stageIndexEl.textContent = `Stage ${stageIndex+1} / ${STAGES.length}`;
+  stageDurationEl.textContent = fmt(stage.duration);
+  stageNameEl.textContent = stage.name;
+  clockEl.textContent = fmt(remaining);
+  clockEl.classList.toggle('danger', running && remaining <= 10);
+  clockSubEl.textContent = finishedAll ? 'complete' : running ? 'in progress' : (remaining === stage.duration ? 'not started' : 'paused');
+
+  const stageProgress = (stage.duration - remaining) / stage.duration;
+  ringEl.style.strokeDashoffset = String(RING_LEN * (1 - stageProgress));
+
+  const elapsedInStage = stage.duration - remaining;
+  const active = getActiveItem(stage, elapsedInStage);
+
+  phraseText.classList.toggle('big-phase', stage.breathing);
+  bottomNote.textContent = stage.breathing ? (stage.bottomNote || '') : '';
+
+  if(active.index !== lastItemIndex || justSwapped === 'force'){
+    lastItemIndex = active.index;
+    phraseCard.classList.add('swap');
+    setTimeout(()=>{
+      phraseText.textContent = active.item.text;
+      phraseCard.classList.remove('swap');
+    }, 140);
+    updateBreathCircle(stage, active);
+  }
+
+  const itemFrac = Math.min(1, (active.itemElapsed+1) / active.item.dur);
+  itemBarFill.style.transition = 'width 1s linear';
+  itemBarFill.style.width = `${itemFrac*100}%`;
+
+  [...railEl.children].forEach((seg, i)=>{
+    const fill = seg.querySelector('.fill');
+    if(i < stageIndex){ seg.classList.add('done'); fill.style.width='100%'; }
+    else if(i === stageIndex){ seg.classList.remove('done'); fill.style.width = `${stageProgress*100}%`; }
+    else { seg.classList.remove('done'); fill.style.width='0%'; }
+  });
+
+  startBtn.textContent = running ? 'Pause' : 'Start';
+  startBtn.classList.toggle('pause-state', running);
+  prevBtn.disabled = stageIndex === 0;
+  nextBtn.disabled = stageIndex === STAGES.length - 1;
+
+  const doneSeconds = elapsedBeforeCurrent() + elapsedInStage;
+  totalFillEl.style.width = `${(doneSeconds/TOTAL)*100}%`;
+  totalLabelEl.textContent = `Total progress: ${fmt(doneSeconds)} / ${fmt(TOTAL)}`;
+}
+
+function tick(){
+  if(remaining > 0){
+    remaining -= 1;
+    render();
+  }
+  if(remaining <= 0){
+    advance();
+  }
+}
+
+function advance(){
+  stopTimer();
+  if(stageIndex < STAGES.length - 1){
+    stageIndex += 1;
+    remaining = STAGES[stageIndex].duration;
+    lastItemIndex = -1;
+    running = true;
+    startTimer();
+    render('force');
+  } else {
+    running = false;
+    finishedAll = true;
+    [...railEl.children].forEach(seg=>{
+      seg.classList.add('done');
+      seg.querySelector('.fill').style.width='100%';
+    });
+    totalFillEl.style.width = '100%';
+    totalLabelEl.textContent = `Total progress: ${fmt(TOTAL)} / ${fmt(TOTAL)}`;
+    liveView.style.display = 'none';
+    doneScreen.classList.add('show');
+    startBtn.textContent = 'Restart';
+    startBtn.classList.remove('pause-state');
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+  }
+}
+
+function startTimer(){
+  stopTimer();
+  intervalId = setInterval(tick, 1000);
+}
+function stopTimer(){
+  if(intervalId){ clearInterval(intervalId); intervalId = null; }
+}
+
+function toggleStartPause(){
+  if(finishedAll){
+    fullReset();
+    return;
+  }
+  running = !running;
+  if(running) startTimer(); else stopTimer();
+  render();
+}
+
+function goNext(){
+  if(stageIndex < STAGES.length - 1){
+    stageIndex += 1;
+    startNewStage();
+  }
+}
+function goPrev(){
+  if(stageIndex > 0){
+    stageIndex -= 1;
+    startNewStage();
+  }
+}
+function startNewStage(){
+  stopTimer();
+  running = false;
+  finishedAll = false;
+  remaining = STAGES[stageIndex].duration;
+  lastItemIndex = -1;
+  render('force');
+}
+function fullReset(){
+  stopTimer();
+  running = false;
+  finishedAll = false;
+  stageIndex = 0;
+  remaining = STAGES[0].duration;
+  lastItemIndex = -1;
+  render('force');
+}
+
+startBtn.addEventListener('click', toggleStartPause);
+prevBtn.addEventListener('click', goPrev);
+nextBtn.addEventListener('click', goNext);
+
+render('force');
+</script>
+</body>
+</html>
