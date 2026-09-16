@@ -1,8 +1,8 @@
 [{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "io.github.tapash81pcl_prog.twa",
-        "sha256_cert_fingerprints": ["1C:90:9A:22:FA:80:E4:B5:A5:FE:8C:79:D6:EA:6F:D5:8D:2B:9B:E2:E2:57:DC:E3:FE:65:35:22:2D:F2:99:3E"]
-      }
-    }]
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.tapash81pcl_prog.twa",
+    "sha256_cert_fingerprints": ["32:C7:E3:C7:F1:C6:42:F6:F9:D1:EC:FB:B5:C5:FF:22:65:EC:15:BE:C4:93:20:F4:C6:7A:2B:61:FF:77:9D:7E"]
+  }
+}]
